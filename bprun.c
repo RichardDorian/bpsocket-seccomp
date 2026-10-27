@@ -23,7 +23,10 @@ void run_child(char *const argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  if (seccomp_rule_add(ctx, SCMP_ACT_NOTIFY, SCMP_SYS(socket), 0)) {
+  if (seccomp_rule_add(ctx, SCMP_ACT_NOTIFY, SCMP_SYS(socket), 0) ||
+      seccomp_rule_add(ctx, SCMP_ACT_NOTIFY, SCMP_SYS(bind), 0) ||
+      seccomp_rule_add(ctx, SCMP_ACT_NOTIFY, SCMP_SYS(recvfrom), 0) ||
+      seccomp_rule_add(ctx, SCMP_ACT_NOTIFY, SCMP_SYS(sendto), 0)) {
     perror("seccomp_rule_add");
     exit(EXIT_FAILURE);
   }
