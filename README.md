@@ -9,3 +9,15 @@ The goal is for Bundle Protocol v7 to have a POSIX compatible API. This poc will
 for the Bundle Protocol at the kernel level (which there is not and probably won't be since the daemon runs in userspace).
 
 Since we're emulating system calls, this works for any program, no matter the lib, even if the binary is statically linked.
+
+## Daemon or daemonless?
+
+`seccomp` requires another process (the supervisor) to receive and handle filtered system calls (`SECCOMP_RET_USER_NOTIF` action).
+
+There are two ways of doing this:
+
+- A single long living process (a daemon) for **all** processes.
+- A supervisor process for each process that starts and stops at the same time the process does (daemonless).
+
+It is also possible to do a combination of the two to have the advantages of the two at the same time. The launcher process or the bootstrap
+library can connect to the daemon if available and fallback to the built-in supervisor (or vice versa).
