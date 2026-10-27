@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <wait.h>
 
+#include "examples/hello/libbp.h"
+
 #define TARGET_NOTIFY_FD 100
 
 void run_child(char *const argv[]) {
@@ -23,7 +25,9 @@ void run_child(char *const argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  if (seccomp_rule_add(ctx, SCMP_ACT_NOTIFY, SCMP_SYS(socket), 0) ||
+  // Only match the socket syscall when address family is AF_BP
+  if (seccomp_rule_add(ctx, SCMP_ACT_NOTIFY, SCMP_SYS(socket), 0, 1,
+                       SCMP_A0(SCMP_CMP_EQ, AF_BP)) ||
       seccomp_rule_add(ctx, SCMP_ACT_NOTIFY, SCMP_SYS(bind), 0) ||
       seccomp_rule_add(ctx, SCMP_ACT_NOTIFY, SCMP_SYS(recvfrom), 0) ||
       seccomp_rule_add(ctx, SCMP_ACT_NOTIFY, SCMP_SYS(sendto), 0)) {
