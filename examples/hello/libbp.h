@@ -1,5 +1,5 @@
-#include <bits/sockaddr.h>
 #include <stdint.h>
+#include <sys/socket.h>
 
 #define AF_BP 60518
 
@@ -9,7 +9,7 @@ typedef enum bp_scheme {
 } bp_scheme_t;
 
 struct sockaddr_bp {
-  __SOCKADDR_COMMON(sbp_);
+  sa_family_t sbp_family;
   bp_scheme_t sbp_scheme;
   union {
     struct {
