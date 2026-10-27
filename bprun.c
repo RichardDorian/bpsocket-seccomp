@@ -1,5 +1,4 @@
 #include <errno.h>
-#include <linux/seccomp.h>
 #include <poll.h>
 #include <seccomp.h>
 #include <signal.h>
@@ -112,19 +111,25 @@ void run_supervisor(int notify_fd) {
   }
 
   while (true) {
+    // POLLIN means there's data to be read
     struct pollfd pfd = {.fd = notify_fd, .events = POLLIN};
 
+    // We wait for the next even
     if (poll(&pfd, 1, -1) < 0) {
+      // A signal arrived while waiting on the supervisor process
       if (errno == EINTR) {
         continue;
       }
 
+      // If an error occured we exit
       break;
     }
 
+    // When the child closes the stream we break the loop
     if (pfd.events & POLLHUP)
       break;
 
+    // If the message parsing fails we simply ignore this packet
     if (seccomp_notify_receive(notify_fd, request) != 0) {
       continue;
     }
